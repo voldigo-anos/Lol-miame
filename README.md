@@ -1,17 +1,77 @@
-<img src="https://i.imgur.com/gU1MsAW.gif" alt="banner">
-<h1 align="center"><img src="./dashboard/images/logo-non-bg.png" width="22px">   𝗠𝗘𝗦𝗦𝗘𝗡𝗚𝗘𝗥 𝗖𝗛𝗔𝗧 𝗕𝗢𝗧</h1>
-<!-- Github README -->
+ <p align="center">
+  <a href="https://git.io/typing-svg">
+    <img src="https://readme-typing-svg.demolab.com?font=Dancing+Script&size=70&pause=1000&color=FF69B4&center=true&vCenter=true&width=1000&height=180&lines=CHRISTUS+FLEMME+BOT;Version+1.0.0;Created+By+CHRISTUS" alt="Typing SVG" />
+  </a>
+</p>
 
-<p align="center"><img src="https://img.shields.io/badge/I Am Eren from %20BANGLADESHI- NOOB PROGRAMMER-green?colorA=%23ff0000&colorB=%23017e40&style=flat-square">
+<p align="center">
+  <img src="https://files.catbox.moe/v9jd7w.jpg" width="800"/>
+</p>
 
-</i></b></h3>
-<h3 align="center">
-  <img src="https://emoji.discord.st/emojis/768b108d-274f-4f44-a634-8477b16efce7.gif" width="25">
-  &nbsp; ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ᴍʏ Profile &nbsp;
-  <img src="https://emoji.discord.st/emojis/768b108d-274f-4f44-a634-8477b16efce7.gif" width="25">
-</h3>
-<img align="center" alt="line" src="https://github.com/DalpatRathore/dalpatrathore/blob/main/assets/images/line-1.svg">
+---
+## 🗿🪽 Fork the Repository
 
+Get your own copy and start customizing:
 
+[![FORK REPO](https://img.shields.io/badge/FORK%20REPO-Click%20Here-FF69B4?style=for-the-badge&logo=github)](https://github.com/3voldi/Flemme/fork)
 
-[![Typing SVG](https://readme-typing-svg.herokuapp.com?color=%23F70B10&size=27&lines=𝙸+𝙰𝙼+𝙸𝙽𝙽𝙾𝙲𝙴𝙽𝚃+𝙱𝙾𝚈;+𝙸𝚃'𝚜+𝙽𝙾𝚃+𝙹𝚄𝚂𝚃+𝙰+𝙽𝙰𝙼𝙴+𝙱𝚁𝙾;𝙸𝚃'R+A+𝙱𝚁𝙰𝙽𝙳;𝚃𝙷𝙰𝙽𝙺+𝚈𝙾𝚄+𝙴𝚅𝙴𝚁𝚈𝙾𝙽𝙴;𝙻𝙾𝚅e+𝚄+𝙰𝙻𝙻+𝙵𝚁𝙸𝙴𝙽𝙳𝚂)](https://git.io/typing-svg)
+---
+
+### 🌷 Deploy to TalkDrove
+<a href="https://host.talkdrove.com/dashboard/select-bot/prepare-deployment?botId=51" target="_blank"><img alt="Deploy" src="https://img.shields.io/badge/DEPLOY-NOW-8A2BE2?style=for-the-badge&logo=visualstudiocode"/></a>
+
+---
+
+### 🌸 Deploy to Replit
+<a href="https://repl.it/github/3voldi/Flemme"><img alt="Replit" src="https://img.shields.io/badge/REPLIT-orange?style=for-the-badge&logo=replit&logoColor=white"/></a>
+
+---
+
+### 💕 Deploy to Koyeb
+<a href="https://app.koyeb.com/auth/signin" target="_blank"><img alt="Koyeb" src="https://img.shields.io/badge/KOYEB-blue?style=for-the-badge&logo=koyeb&logoColor=white"/></a>
+
+---
+
+### 🌹 Deploy to Railway
+<a href="https://railway.app/new" target="_blank"><img alt="Railway" src="https://img.shields.io/badge/RAILWAY-black?style=for-the-badge&logo=railway"/></a>
+
+---
+
+### ✨ More Deployment Options
+
+- **Glitch:** <a href="https://glitch.com/signup" target="_blank"><img src="https://img.shields.io/badge/GLITCH-pink?style=for-the-badge&logo=glitch"/></a>
+- **Codespaces:** <a href="https://github.com/codespaces/new" target="_blank"><img src="https://img.shields.io/badge/CODESPACE-navy?style=for-the-badge&logo=visualstudiocode"/></a>
+- **Render:** <a href="https://dashboard.render.com" target="_blank"><img src="https://img.shields.io/badge/RENDER-maroon?style=for-the-badge&logo=render"/></a>
+
+---
+
+## ⚡ CI/CD Workflow Example
+
+.github/workflows/deploy.yml
+
+```yaml
+name: Node.js CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm install
+      - name: Start app
+        run: npm start
