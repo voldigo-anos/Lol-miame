@@ -1,11 +1,12 @@
 const fonts = require('../../func/fonts.js');
+const autoBanHandler = require('../../func/autoBanHandler.js');
 
 module.exports = {
     config: {
         name: "autoban",
         aliases: ["ab", "autobanning"],
         version: "1.0.0",
-        author: "Aryan Chauhan",
+        author: "Christus",
         countDown: 5,
         role: 2,
         description: {
