@@ -1,5 +1,5 @@
 const { getTime } = global.utils;
-const fonts = require('../../func/fonts.js');
+const fonts = require('../../func/font.js');
 const bankData = require('../../func/bankData.js');
 
 module.exports = {
