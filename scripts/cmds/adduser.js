@@ -1,11 +1,12 @@
+const fonts = require('../../func/font.js');
 const { findUid } = global.utils;
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 module.exports = {
-	config: {
+	config: {}
 		name: "adduser",
-		version: "1.5",
-		author: "NTKhang",
+		version: "1.6",
+		author: "Christus",
 		countDown: 5,
 		role: 1,
 		description: {
@@ -21,23 +22,23 @@ module.exports = {
 	langs: {
 		vi: {
 			alreadyInGroup: "Đã có trong nhóm",
-			successAdd: "- Đã thêm thành công %1 thành viên vào nhóm",
-			failedAdd: "- Không thể thêm %1 thành viên vào nhóm",
-			approve: "- Đã thêm %1 thành viên vào danh sách phê duyệt",
-			invalidLink: "Vui lòng nhập link facebook hợp lệ",
-			cannotGetUid: "Không thể lấy được uid của người dùng này",
-			linkNotExist: "Profile url này không tồn tại",
-			cannotAddUser: "Bot bị chặn tính năng hoặc người dùng này chặn người lạ thêm vào nhóm"
+			successAdd: `✅ ${fonts.bold("Thành công:")} Đã thêm %1 thành viên vào nhóm`,
+			failedAdd: `❌ ${fonts.bold("Thất bại:")} Không thể thêm %1 thành viên`,
+			approve: `⏳ ${fonts.bold("Phê duyệt:")} Đã thêm %1 thành viên vào danh sách chờ`,
+			invalidLink: "Link Facebook không hợp lệ",
+			cannotGetUid: "Không thể lấy UID",
+			linkNotExist: "Profile không tồn tại",
+			cannotAddUser: "Bot bị chặn hoặc user chặn người lạ"
 		},
 		en: {
 			alreadyInGroup: "Already in group",
-			successAdd: "- Successfully added %1 members to the group",
-			failedAdd: "- Failed to add %1 members to the group",
-			approve: "- Added %1 members to the approval list",
-			invalidLink: "Please enter a valid facebook link",
-			cannotGetUid: "Cannot get uid of this user",
-			linkNotExist: "This profile url does not exist",
-			cannotAddUser: "Bot is blocked or this user blocked strangers from adding to the group"
+			successAdd: `✅ ${fonts.bold("SUCCESS:")} Added %1 members to the group`,
+			failedAdd: `❌ ${fonts.bold("FAILED:")} Could not add %1 members`,
+			approve: `⏳ ${fonts.bold("APPROVAL:")} Added %1 members to waitlist`,
+			invalidLink: "Invalid Facebook link",
+			cannotGetUid: "Cannot get UID",
+			linkNotExist: "Profile does not exist",
+			cannotAddUser: "Bot blocked or user privacy settings"
 		}
 	},
 
@@ -45,15 +46,11 @@ module.exports = {
 		const { members, adminIDs, approvalMode } = await threadsData.get(event.threadID);
 		const botID = api.getCurrentUserID();
 
+		const header = `${fonts.square(" ADD USER ")}\n${"━".repeat(12)}\n`;
+
 		const success = [
-			{
-				type: "success",
-				uids: []
-			},
-			{
-				type: "waitApproval",
-				uids: []
-			}
+			{ type: "success", uids: [] },
+			{ type: "waitApproval", uids: [] }
 		];
 		const failed = [];
 
@@ -70,6 +67,7 @@ module.exports = {
 		}
 
 		const regExMatchFB = /(?:https?:\/\/)?(?:www\.)?(?:facebook|fb|m\.facebook)\.(?:com|me)\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[\w\-]*\/)*([\w\-\.]+)(?:\/)?/i;
+		
 		for (const item of args) {
 			let uid;
 			let continueLoop = false;
@@ -104,8 +102,7 @@ module.exports = {
 			else
 				continue;
 
-			if (continueLoop == true)
-				continue;
+			if (continueLoop == true) continue;
 
 			if (members.some(m => m.userID == uid && m.inGroup)) {
 				checkErrorAndPush(getLang("alreadyInGroup"), item);
@@ -126,15 +123,26 @@ module.exports = {
 
 		const lengthUserSuccess = success[0].uids.length;
 		const lengthUserWaitApproval = success[1].uids.length;
-		const lengthUserError = failed.length;
-
-		let msg = "";
+		
+		let msg = header;
+		
 		if (lengthUserSuccess)
-			msg += `${getLang("successAdd", lengthUserSuccess)}\n`;
+			msg += `${getLang("successAdd", fonts.bold(lengthUserSuccess))}\n`;
+		
 		if (lengthUserWaitApproval)
-			msg += `${getLang("approve", lengthUserWaitApproval)}\n`;
-		if (lengthUserError)
-			msg += `${getLang("failedAdd", failed.reduce((a, b) => a + b.uids.length, 0))} ${failed.reduce((a, b) => a += `\n    + ${b.uids.join('\n       ')}: ${b.type}`, "")}`;
+			msg += `${getLang("approve", fonts.bold(lengthUserWaitApproval))}\n`;
+		
+		if (failed.length > 0) {
+			const totalFailed = failed.reduce((a, b) => a + b.uids.length, 0);
+			msg += `\n${getLang("failedAdd", fonts.bold(totalFailed))}`;
+			
+			failed.forEach(error => {
+				msg += `\n${fonts.sansSerif(" ⚠︎ " + error.type)}: ${fonts.monospace(error.uids.join(', '))}`;
+			});
+		}
+
+		if (!lengthUserSuccess && !lengthUserWaitApproval && failed.length === 0) return;
+
 		await message.reply(msg);
 	}
-};
+	};;
