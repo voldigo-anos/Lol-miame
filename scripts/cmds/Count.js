@@ -1,3 +1,5 @@
+const fonts = require('../../func/font.js');
+
 module.exports = {
 	config: {
 		name: "count",
@@ -649,3 +651,4 @@ module.exports = {
 	}
 
 };
+
