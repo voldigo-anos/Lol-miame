@@ -1,9 +1,11 @@
+const fonts = require('../../func/font.js');
+
 module.exports = {
 	config: {
 		name: "onlyadminbox",
 		aliases: ["onlyadbox", "adboxonly", "adminboxonly"],
-		version: "1.3",
-		author: "NTKhang",
+		version: "1.4",
+		author: "Christus",
 		countDown: 5,
 		role: 1,
 		description: {
@@ -12,31 +14,30 @@ module.exports = {
 		},
 		category: "box chat",
 		guide: {
-			vi: "   {pn} [on | off]: bật/tắt chế độ chỉ quản trị viên nhóm mới có thể sử dụng bot"
-				+ "\n   {pn} noti [on | off]: bật/tắt thông báo khi người dùng không phải là quản trị viên nhóm sử dụng bot",
-			en: "   {pn} [on | off]: turn on/off the mode only admin of group can use bot"
-				+ "\n   {pn} noti [on | off]: turn on/off the notification when user is not admin of group use bot"
+			vi: `   {pn} [on | off]: bật/tắt chế độ chỉ quản trị viên nhóm mới có thể sử dụng bot\n   {pn} noti [on | off]: bật/tắt thông báo khi người dùng không phải là quản trị viên nhóm sử dụng bot`,
+			en: `   {pn} [on | off]: turn on/off the mode only admin of group can use bot\n   {pn} noti [on | off]: turn on/off the notification when user is not admin of group use bot`
 		}
 	},
 
 	langs: {
 		vi: {
-			turnedOn: "Đã bật chế độ chỉ quản trị viên nhóm mới có thể sử dụng bot",
-			turnedOff: "Đã tắt chế độ chỉ quản trị viên nhóm mới có thể sử dụng bot",
-			turnedOnNoti: "Đã bật thông báo khi người dùng không phải là quản trị viên nhóm sử dụng bot",
-			turnedOffNoti: "Đã tắt thông báo khi người dùng không phải là quản trị viên nhóm sử dụng bot",
-			syntaxError: "Sai cú pháp, chỉ có thể dùng {pn} on hoặc {pn} off"
+			turnedOn: `✅ ${fonts.bold("Thành công:")} Đã bật chế độ ${fonts.italic("chỉ quản trị viên")} mới có thể sử dụng bot`,
+			turnedOff: `✅ ${fonts.bold("Thành công:")} Đã tắt chế độ ${fonts.italic("chỉ quản trị viên")}. Tất cả thành viên đều có thể dùng bot`,
+			turnedOnNoti: `🔔 ${fonts.bold("Thông báo:")} Đã bật thông báo khi người không phải admin dùng bot`,
+			turnedOffNoti: `🔕 ${fonts.bold("Thông báo:")} Đã tắt thông báo khi người không phải admin dùng bot`,
+			syntaxError: `❌ ${fonts.bold("Lỗi cú pháp:")} Vui lòng sử dụng {pn} on hoặc {pn} off`
 		},
 		en: {
-			turnedOn: "Turned on the mode only admin of group can use bot",
-			turnedOff: "Turned off the mode only admin of group can use bot",
-			turnedOnNoti: "Turned on the notification when user is not admin of group use bot",
-			turnedOffNoti: "Turned off the notification when user is not admin of group use bot",
-			syntaxError: "Syntax error, only use {pn} on or {pn} off"
+			turnedOn: `✅ ${fonts.bold("SUCCESS:")} Turned on ${fonts.italic("Admin Only")} mode for this group`,
+			turnedOff: `✅ ${fonts.bold("SUCCESS:")} Turned off ${fonts.italic("Admin Only")} mode`,
+			turnedOnNoti: `🔔 ${fonts.bold("NOTIFICATION:")} Enabled alerts for non-admin users`,
+			turnedOffNoti: `🔕 ${fonts.bold("NOTIFICATION:")} Disabled alerts for non-admin users`,
+			syntaxError: `❌ ${fonts.bold("SYNTAX ERROR:")} Please use {pn} on or {pn} off`
 		}
 	},
 
 	onStart: async function ({ args, message, event, threadsData, getLang }) {
+		const header = `${fonts.square(" ADMIN BOX ")}\n${"━".repeat(12)}\n`;
 		let isSetNoti = false;
 		let value;
 		let keySetData = "data.onlyAdminBox";
@@ -53,13 +54,16 @@ module.exports = {
 		else if (args[indexGetVal] == "off")
 			value = false;
 		else
-			return message.reply(getLang("syntaxError"));
+			return message.reply(header + getLang("syntaxError"));
 
 		await threadsData.set(event.threadID, isSetNoti ? !value : value, keySetData);
 
+		let replyMsg = header;
 		if (isSetNoti)
-			return message.reply(value ? getLang("turnedOnNoti") : getLang("turnedOffNoti"));
+			replyMsg += value ? getLang("turnedOnNoti") : getLang("turnedOffNoti");
 		else
-			return message.reply(value ? getLang("turnedOn") : getLang("turnedOff"));
+			replyMsg += value ? getLang("turnedOn") : getLang("turnedOff");
+
+		return message.reply(replyMsg);
 	}
 };
