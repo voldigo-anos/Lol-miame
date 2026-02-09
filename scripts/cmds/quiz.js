@@ -1,4 +1,5 @@
 const axios = require('axios');
+const fonts = require('../../func/font.js');
 
 const BASE_URL = 'https://qizapi.onrender.com/api';
 
