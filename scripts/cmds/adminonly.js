@@ -1,4 +1,5 @@
 const fs = require("fs-extra");
+const fonts = require('../../func/font.js');
 const { config } = global.GoatBot;
 const { client } = global;
 
@@ -6,8 +7,8 @@ module.exports = {
 	config: {
 		name: "adminonly",
 		aliases: ["adonly", "onlyad", "onlyadmin"],
-		version: "1.5",
-		author: "NTKhang",
+		version: "1.6",
+		author: "Christus",
 		countDown: 5,
 		role: 2,
 		description: {
@@ -16,29 +17,28 @@ module.exports = {
 		},
 		category: "owner",
 		guide: {
-			vi: "   {pn} [on | off]: bật/tắt chế độ chỉ admin mới có thể sử dụng bot"
-				+ "\n   {pn} noti [on | off]: bật/tắt thông báo khi người dùng không phải là admin sử dụng bot",
-			en: "   {pn} [on | off]: turn on/off the mode only admin can use bot"
-				+ "\n   {pn} noti [on | off]: turn on/off the notification when user is not admin use bot"
+			vi: "   {pn} [on | off]: bật/tắt chế độ chỉ admin mới có thể sử dụng bot\n   {pn} noti [on | off]: bật/tắt thông báo khi người dùng không phải là admin sử dụng bot",
+			en: "   {pn} [on | off]: turn on/off the mode only admin can use bot\n   {pn} noti [on | off]: turn on/off the notification when user is not admin use bot"
 		}
 	},
 
 	langs: {
 		vi: {
-			turnedOn: "Đã bật chế độ chỉ admin mới có thể sử dụng bot",
-			turnedOff: "Đã tắt chế độ chỉ admin mới có thể sử dụng bot",
-			turnedOnNoti: "Đã bật thông báo khi người dùng không phải là admin sử dụng bot",
-			turnedOffNoti: "Đã tắt thông báo khi người dùng không phải là admin sử dụng bot"
+			turnedOn: `✅ ${fonts.bold("Thành công:")} Đã bật chế độ ${fonts.italic("chỉ Admin tổng")} mới có thể sử dụng bot toàn cầu`,
+			turnedOff: `✅ ${fonts.bold("Thành công:")} Đã tắt chế độ ${fonts.italic("chỉ Admin tổng")}. Tất cả người dùng đều có thể sử dụng`,
+			turnedOnNoti: `🔔 ${fonts.bold("Thông báo:")} Đã bật cảnh báo khi người lạ dùng bot`,
+			turnedOffNoti: `🔕 ${fonts.bold("Thông báo:")} Đã tắt cảnh báo khi người lạ dùng bot`
 		},
 		en: {
-			turnedOn: "Turned on the mode only admin can use bot",
-			turnedOff: "Turned off the mode only admin can use bot",
-			turnedOnNoti: "Turned on the notification when user is not admin use bot",
-			turnedOffNoti: "Turned off the notification when user is not admin use bot"
+			turnedOn: `✅ ${fonts.bold("SUCCESS:")} ${fonts.italic("Global Admin Only")} mode has been enabled`,
+			turnedOff: `✅ ${fonts.bold("SUCCESS:")} ${fonts.italic("Global Admin Only")} mode has been disabled`,
+			turnedOnNoti: `🔔 ${fonts.bold("NOTIFICATION:")} Alerts for non-admin users enabled`,
+			turnedOffNoti: `🔕 ${fonts.bold("NOTIFICATION:")} Alerts for non-admin users disabled`
 		}
 	},
 
 	onStart: function ({ args, message, getLang }) {
+		const header = `${fonts.square(" GLOBAL ADMIN ONLY ")}\n${"━".repeat(12)}\n`;
 		let isSetNoti = false;
 		let value;
 		let indexGetVal = 0;
@@ -55,15 +55,17 @@ module.exports = {
 		else
 			return message.SyntaxError();
 
+		let replyMsg = header;
 		if (isSetNoti) {
 			config.hideNotiMessage.adminOnly = !value;
-			message.reply(getLang(value ? "turnedOnNoti" : "turnedOffNoti"));
+			replyMsg += getLang(value ? "turnedOnNoti" : "turnedOffNoti");
 		}
 		else {
 			config.adminOnly.enable = value;
-			message.reply(getLang(value ? "turnedOn" : "turnedOff"));
+			replyMsg += getLang(value ? "turnedOn" : "turnedOff");
 		}
 
 		fs.writeFileSync(client.dirConfig, JSON.stringify(config, null, 2));
+		return message.reply(replyMsg);
 	}
 };
