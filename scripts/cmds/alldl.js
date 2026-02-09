@@ -2,30 +2,36 @@ const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
 const mime = require("mime-types");
+const fonts = require('../../func/font.js');
 
 module.exports = {
   config: {
     name: "alldl",
     aliases: ["autodl"],
-    version: "1.6.9",
-    author: "Nazrul",
+    version: "1.7.0",
+    author: "Christus",
     role: 0,
     description: "Auto download media from any platform",
     category: "media",
-    guide: { en: "Send any media link" }
+    guide: { en: "Send any media link to download automatically" }
   },
 
   onStart: async function ({ message, threadsData, event, args }) {
+    const header = `${fonts.square(" AUTO DOWNLOAD ")}\n${"━".repeat(12)}\n`;
     const status = args[0];
+    
     if (!["on", "off"].includes(status))
-      return message.reply("• Use: autodl on/off");
+      return message.reply(header + `• ${fonts.sansSerif("Use:")} ${fonts.monospace("autodl on/off")}`);
 
     const value = status === "on";
     const tData = (await threadsData.get(event.threadID, "data")) || {};
     tData.autodown_enabled = value;
 
     await threadsData.set(event.threadID, tData, "data");
-    return message.send(value ? "• Auto download enabled for this thread." : "× auto download disabled for this thread.");
+    
+    return message.send(header + (value 
+      ? `✅ ${fonts.bold("Enabled:")} ${fonts.italic("Auto download is now active for this thread.")}` 
+      : `❌ ${fonts.bold("Disabled:")} ${fonts.italic("Auto download has been turned off.")}`));
   },
 
   onChat: async function ({ event, message, threadsData }) {
@@ -41,12 +47,10 @@ module.exports = {
     try {
       await message.reaction("⏳", event.messageID);
 
-      const apiUrl =
-        (await axios.get("https://raw.githubusercontent.com/nazrul4x/Noobs/main/Apis.json")).data.api2;
+      const apiUrl = (await axios.get("https://raw.githubusercontent.com/nazrul4x/Noobs/main/Apis.json")).data.api2;
 
       for (let url of urls) {
-        let data = null;
-
+        let mediaData = null;
         const endpoints = [
           `${apiUrl}/alldlxx?url=${encodeURIComponent(url)}`,
           `${apiUrl}/alldl2?url=${encodeURIComponent(url)}`
@@ -56,16 +60,16 @@ module.exports = {
           try {
             const res = await axios.get(endpoint);
             if (res.data) {
-              data = res.data;
+              mediaData = res.data;
               break;
             }
           } catch {}
         }
 
-        if (!data) continue;
+        if (!mediaData) continue;
 
-        const platform = data.p || detectPlatform(url);
-        const mediaUrls = extractMediaUrls(data);
+        const platform = mediaData.p || detectPlatform(url);
+        const mediaUrls = extractMediaUrls(mediaData);
         if (!mediaUrls.length) continue;
 
         for (let mediaUrl of mediaUrls) {
@@ -77,13 +81,13 @@ module.exports = {
             let size = head?.headers?.["content-length"] || 0;
             let mb = (size / (1024 * 1024)).toFixed(2);
 
-            const wUrl = (
-              await axios.get(`https://tinyurl.com/api-create.php?url=${mediaUrl}`)
-            ).data;
+            const wUrl = (await axios.get(`https://tinyurl.com/api-create.php?url=${mediaUrl}`)).data;
 
             if (size && size > 35 * 1024 * 1024) {
               await message.send(
-                `× The media size is ${mb} MB, couldn’t send\n• download it manually : ${wUrl}`
+                `❌ ${fonts.bold("Limit Exceeded:")}\n` +
+                `${fonts.sansSerif("Size:")} ${fonts.monospace(mb + " MB")}\n` +
+                `${fonts.italic("Manual download:")} ${wUrl}`
               );
               continue;
             }
@@ -97,7 +101,6 @@ module.exports = {
 
             let type = response.headers["content-type"] || "";
             let ext = mime.extension(type) || "mp4";
-
             const allowed = ["mp4", "mp3", "wav", "png", "jpg", "jpeg", "gif", "webp"];
             if (!allowed.includes(ext)) ext = "mp4";
 
@@ -118,29 +121,29 @@ module.exports = {
 
             try {
               await message.send({
-                body: `✅ Here's your downloaded ${t}\n🛠️ Platform: ${platform}`,
+                body: `✅ ${fonts.bold("DOWNLOAD SUCCESS")}\n` +
+                      `${"━".repeat(15)}\n` +
+                      `${fonts.sansSerif("Type:")} ${fonts.fancy(t)}\n` +
+                      `${fonts.sansSerif("Platform:")} ${fonts.bold(platform)}\n` +
+                      `${fonts.sansSerif("Size:")} ${fonts.monospace(mb + " MB")}`,
                 attachment: fs.createReadStream(filePath)
               });
               success = true;
             } catch {
               await message.send(
-                `× The media size is ${mb} MB or couldn’t send it\n• download it manually : ${wUrl}`
+                `❌ ${fonts.bold("Upload Failed:")}\n` +
+                `${fonts.sansSerif("Size:")} ${fonts.monospace(mb + " MB")}\n` +
+                `${fonts.italic("Manual download:")} ${wUrl}`
               );
             }
 
-            fs.unlinkSync(filePath);
+            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
           } catch {
-            const wUrl = (
-              await axios.get(`https://tinyurl.com/api-create.php?url=${mediaUrl}`)
-            ).data;
-
-            await message.send(
-              `× Couldn’t send the media\n• download it manually : ${wUrl}`
-            );
+            const wUrl = (await axios.get(`https://tinyurl.com/api-create.php?url=${mediaUrl}`)).data;
+            await message.send(`❌ ${fonts.bold("Error:")} ${fonts.italic("Could not fetch media. Manual link:")} ${wUrl}`);
           }
         }
       }
-
       await message.reaction(success ? "✅" : "❌", event.messageID);
     } catch {
       await message.reaction("❌", event.messageID);
@@ -166,4 +169,4 @@ function extractMediaUrls(data) {
   if (data.media && Array.isArray(data.media)) return data.media.map(m => m.link).filter(Boolean);
   if (data.files && Array.isArray(data.files)) return data.files;
   return [];
-}
+                                                               }
