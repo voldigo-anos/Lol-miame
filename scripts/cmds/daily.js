@@ -1,10 +1,11 @@
 const moment = require("moment-timezone");
+const fonts = require('../../func/font.js');
 
 module.exports = {
 	config: {
 		name: "daily",
-		version: "1.2",
-		author: "NTKhang",
+		version: "1.3",
+		author: "Christus",
 		countDown: 5,
 		role: 0,
 		description: {
@@ -13,10 +14,8 @@ module.exports = {
 		},
 		category: "game",
 		guide: {
-			vi: "   {pn}: Nhận quà hàng ngày"
-				+ "\n   {pn} info: Xem thông tin quà hàng ngày",
-			en: "   {pn}"
-				+ "\n   {pn} info: View daily gift information"
+			vi: "   {pn}: Nhận quà hàng ngày\n   {pn} info: Xem thông tin quà hàng ngày",
+			en: "   {pn}\n   {pn} info: View daily gift information"
 		},
 		envConfig: {
 			rewardFirstDay: {
@@ -35,8 +34,8 @@ module.exports = {
 			friday: "Thứ 6",
 			saturday: "Thứ 7",
 			sunday: "Chủ nhật",
-			alreadyReceived: "Bạn đã nhận quà rồi",
-			received: "Bạn đã nhận được %1 coin và %2 exp"
+			alreadyReceived: `❌ ${fonts.bold("Thất bại:")} Bạn đã nhận quà của ngày hôm nay rồi.`,
+			received: `✅ ${fonts.bold("Thành công:")} Bạn đã nhận được ${fonts.monospace("%1")} coin và ${fonts.monospace("%2")} exp!`
 		},
 		en: {
 			monday: "Monday",
@@ -46,15 +45,17 @@ module.exports = {
 			friday: "Friday",
 			saturday: "Saturday",
 			sunday: "Sunday",
-			alreadyReceived: "You have already received the gift",
-			received: "You have received %1 coin and %2 exp"
+			alreadyReceived: `❌ ${fonts.bold("FAILED:")} You have already claimed your daily reward today.`,
+			received: `✅ ${fonts.bold("SUCCESS:")} You claimed ${fonts.monospace("%1")} coins and ${fonts.monospace("%2")} exp!`
 		}
 	},
 
 	onStart: async function ({ args, message, event, envCommands, usersData, commandName, getLang }) {
+		const header = `${fonts.square(" DAILY REWARD ")}\n${"━".repeat(12)}\n`;
 		const reward = envCommands[commandName].rewardFirstDay;
+
 		if (args[0] == "info") {
-			let msg = "";
+			let msg = header + `${fonts.italic("Reward list for the week:")}\n\n`;
 			for (let i = 1; i < 8; i++) {
 				const getCoin = Math.floor(reward.coin * (1 + 20 / 100) ** ((i == 0 ? 7 : i) - 1));
 				const getExp = Math.floor(reward.exp * (1 + 20 / 100) ** ((i == 0 ? 7 : i) - 1));
@@ -65,28 +66,30 @@ module.exports = {
 								i == 3 ? getLang("wednesday") :
 									i == 2 ? getLang("tuesday") :
 										getLang("monday");
-				msg += `${day}: ${getCoin} coin, ${getExp} exp\n`;
+				msg += `• ${fonts.bold(day)}: ${fonts.monospace(getCoin)} $ | ${fonts.monospace(getExp)} exp\n`;
 			}
 			return message.reply(msg);
 		}
 
 		const dateTime = moment.tz("Asia/Ho_Chi_Minh").format("DD/MM/YYYY");
 		const date = new Date();
-		const currentDay = date.getDay(); // 0: sunday, 1: monday, 2: tuesday, 3: wednesday, 4: thursday, 5: friday, 6: saturday
+		const currentDay = date.getDay();
 		const { senderID } = event;
 
 		const userData = await usersData.get(senderID);
 		if (userData.data.lastTimeGetReward === dateTime)
-			return message.reply(getLang("alreadyReceived"));
+			return message.reply(header + getLang("alreadyReceived"));
 
 		const getCoin = Math.floor(reward.coin * (1 + 20 / 100) ** ((currentDay == 0 ? 7 : currentDay) - 1));
 		const getExp = Math.floor(reward.exp * (1 + 20 / 100) ** ((currentDay == 0 ? 7 : currentDay) - 1));
+		
 		userData.data.lastTimeGetReward = dateTime;
 		await usersData.set(senderID, {
 			money: userData.money + getCoin,
 			exp: userData.exp + getExp,
 			data: userData.data
 		});
-		message.reply(getLang("received", getCoin, getExp));
+
+		return message.reply(header + getLang("received", getCoin.toLocaleString(), getExp.toLocaleString()));
 	}
 };
